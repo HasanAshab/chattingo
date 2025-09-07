@@ -21,7 +21,7 @@ pipeline {
     environment {
         DOCKER_CREDENTIALS_ID = 'docker'
         DOCKER_REGISTRY = 'docker.io'
-        DOCKER_IMAGE_BASE = 'wanderlust'
+        DOCKER_IMAGE_BASE = 'chatingo'
         SERVICE_NAME = 'frontend'
     }
 
@@ -90,7 +90,6 @@ pipeline {
                         dir(env.SERVICE_NAME) {
                             script {
                                 sonarqube_analysis("sonarqube-server", env.SERVICE_NAME, env.SERVICE_NAME)
-                                sh 'ls -la'
                                 sonarqube_code_quality()
                             }
                         }
@@ -100,13 +99,11 @@ pipeline {
                 stage('Scan Docker [Trivy]') {
                     steps {
                         script {
-                            docker_scan(
+                            docker_build_and_scan(
                                 CredId: env.DOCKER_CREDENTIALS_ID,
-                                Registry: env.DOCKER_REGISTRY,
                                 ImageBase: env.DOCKER_IMAGE_BASE,
                                 ImageSuffix: env.SERVICE_NAME,
                                 Tags: [params.SHORT_SHA, 'latest'],
-                                Push: env.GIT_BRANCH == 'main',
                             )
                         }
                     }
