@@ -1,5 +1,5 @@
-# Build stage with Maven and JDK 11
-FROM maven:3.8.5-eclipse-temurin-11 AS builder
+# Build stage with Maven and JDK 17
+FROM maven:3.8.5-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ RUN jar -xf ./target/*.jar
 
 
 # Slim production image with JRE only
-FROM eclipse-temurin:11-jre-focal
+FROM eclipse-temurin:17-jre-focal
 
 VOLUME /tmp
 
@@ -26,7 +26,7 @@ COPY --from=builder /app/META-INF /app/META-INF
 COPY --from=builder /app/BOOT-INF/classes /app
 COPY --from=builder /app/BOOT-INF/lib /app/lib
 
-EXPOSE 80
+EXPOSE 8080
 
 # Run the application
 ENTRYPOINT [ "java", "-cp","app:app/lib/*", "com.chattingo.ChattingoApplication" ]
