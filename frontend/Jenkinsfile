@@ -37,6 +37,8 @@ pipeline {
                     if (!params.SHORT_SHA?.trim()) {
                         error "Parameter SHORT_SHA is required but not provided!"
                     }
+                    echo "GIT_BRANCH: ${params.GIT_BRANCH}"
+                    echo "SHORT_SHA: ${params.SHORT_SHA}"
                 }
             }
         }
