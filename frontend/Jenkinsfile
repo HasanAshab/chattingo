@@ -21,10 +21,13 @@ pipeline {
     }
 
     environment {
+        SERVICE_NAME = 'frontend'
+
         DOCKER_CREDENTIALS_ID = 'docker'
         DOCKER_REGISTRY = 'docker.io'
         DOCKER_IMAGE_BASE = 'chattingo'
-        SERVICE_NAME = 'frontend'
+
+        GITHUB_SSH_CREDENTIALS_ID = 'github-ssh-key'
     }
 
     stages {
@@ -140,7 +143,7 @@ pipeline {
                 dir('chattingo-compose') {
                     git branch: 'main',
                           url: 'git@github.com:HasanAshab/chattingo-compose.git',
-                          credentialsId: 'github-ssh-key'
+                          credentialsId: env.GITHUB_SSH_CREDENTIALS_ID
 
                     // Update image tag
                     sh """
@@ -151,10 +154,12 @@ pipeline {
                     """
 
                     // Change remote and push changes
-                    sh """
-                    git remote set-url origin git@github.com:HasanAshab/chattingo-compose.git
-                    GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git push origin HEAD:main
-                    """
+                    withCredentials([sshUserPrivateKey(credentialsId: env.GITHUB_SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+                        sh """
+                        git remote set-url origin git@github.com:HasanAshab/chattingo-compose.git
+                        GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git push origin HEAD:main
+                        """
+                    }
                 }
             }
         }
