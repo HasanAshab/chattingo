@@ -1,5 +1,7 @@
 @Library('Shared') _ // https://github.com/HasanAshab/Jenkins_SharedLib
 pipeline {
+    // WARN: Never use master node for
+    // running pipeline in production
     agent any
 
     options {
@@ -124,6 +126,24 @@ pipeline {
                         ImageSuffix: env.SERVICE_NAME,
                         Tags: [params.SHORT_SHA, 'latest'],
                     )
+                }
+            }
+        }
+
+        stage('Update Compose') {
+            when {
+                expression { env.GIT_BRANCH == 'main' }
+            }
+            steps {
+                sshagent(['vps-ssh-key']) {
+                    sh """
+                    ssh root@<VPS_IP> '
+                      cd /path/to/compose
+                      sed -i "s|image: chatingo/frontend:.*|image: chatingo/frontend:${params.SHORT_SHA}|" docker-compose.yml
+                      docker-compose pull
+                      docker-compose up -d
+                    '
+                    """
                 }
             }
         }

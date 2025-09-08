@@ -1,4 +1,6 @@
 pipeline {
+    // WARN: Never use master node for
+    // running pipeline in production
     agent any
 
     options {
