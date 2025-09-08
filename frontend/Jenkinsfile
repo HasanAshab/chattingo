@@ -137,15 +137,23 @@ pipeline {
                 expression { env.GIT_BRANCH == 'origin/main' }
             }
             steps {
-                sshagent(['github-ssh-key']) {
+                dir('chattingo-compose') {
+                    git branch: 'main',
+                          url: 'git@github.com:HasanAshab/chattingo-compose.git',
+                          credentialsId: 'github-ssh-key'
+
+                    // Update image tag
                     sh """
-                    git clone git@github.com:HasanAshab/chattingo-compose.git
-                    cd chattingo-compose
                     sed -i "s|image: chatingo/frontend:.*|image: chatingo/frontend:${params.SHORT_SHA}|" docker-compose.yml
                     git config user.email "ci@jenkins"
                     git config user.name "Jenkins CI"
                     git commit -am "ci: update frontend image tag to ${params.SHORT_SHA}"
-                    git push origin main
+                    """
+
+                    // Change remote and push
+                    sh """
+                    git remote set-url origin git@github.com:HasanAshab/chattingo-compose.git
+                    GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git push origin HEAD:main
                     """
                 }
             }
