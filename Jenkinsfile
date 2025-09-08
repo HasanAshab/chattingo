@@ -34,10 +34,10 @@ pipeline {
 
                     echo "Services to build:"
                     if (env.BUILD_FRONTEND == "true") {
-                        echo "-  Frontend"
+                        echo "- Frontend"
                     }
                     if (env.BUILD_BACKEND == "true") {
-                        echo "-  Backend"
+                        echo "- Backend"
                     }
                 }
             }
