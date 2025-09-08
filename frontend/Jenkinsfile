@@ -117,7 +117,7 @@ pipeline {
 
         stage('Push Docker Image') {
             when {
-                expression { env.GIT_BRANCH == 'main' }
+                expression { env.GIT_BRANCH == 'origin/main' }
             }
             steps {
                 script {
@@ -134,7 +134,7 @@ pipeline {
 
         stage('Update Compose Repo') {
             when {
-                expression { env.GIT_BRANCH == 'main' }
+                expression { env.GIT_BRANCH == 'origin/main' }
             }
             steps {
                 sh """
@@ -151,7 +151,7 @@ pipeline {
 
         stage('Deploy to VPS') {
             when {
-                expression { env.GIT_BRANCH == 'main' }
+                expression { env.GIT_BRANCH == 'origin/main' }
             }
             steps {
                 sshagent(['vps-ssh-key']) {
