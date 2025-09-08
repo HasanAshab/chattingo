@@ -148,6 +148,7 @@ pipeline {
                 """
             }
         }
+
         stage('Deploy to VPS') {
             when {
                 expression { env.GIT_BRANCH == 'origin/main' }
