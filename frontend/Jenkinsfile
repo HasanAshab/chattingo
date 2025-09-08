@@ -144,7 +144,7 @@ pipeline {
 
                     // Update image tag
                     sh """
-                    sed -i "s|image: chatingo/frontend:.*|image: chatingo/frontend:${params.SHORT_SHA}|" docker-compose.yml
+                    sed -i "s|image: chatingo-frontend:.*|image: chatingo-frontend:${params.SHORT_SHA}|" docker-compose.yml
                     git config user.email "ci@jenkins"
                     git config user.name "Jenkins CI"
                     git commit -am "ci: update frontend image tag to ${params.SHORT_SHA}"
