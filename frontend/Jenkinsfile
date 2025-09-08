@@ -150,7 +150,7 @@ pipeline {
                     git commit -am "ci: update frontend image tag to ${params.SHORT_SHA}"
                     """
 
-                    // Change remote and push
+                    // Change remote and push changes
                     sh """
                     git remote set-url origin git@github.com:HasanAshab/chattingo-compose.git
                     GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git push origin HEAD:main
