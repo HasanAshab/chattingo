@@ -156,7 +156,6 @@ pipeline {
                     // Change remote and push changes
                     withCredentials([sshUserPrivateKey(credentialsId: env.GITHUB_SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                         sh """
-                        git remote set-url origin git@github.com:HasanAshab/chattingo-compose.git
                         GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git push origin HEAD:main
                         """
                     }
@@ -174,8 +173,7 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no root@72.60.111.27 '
                       cd /chattingo-compose
                       git pull origin main
-                      docker-compose pull
-                      docker-compose up -d
+                     //... do rest of task
                     '
                     """
                 }
