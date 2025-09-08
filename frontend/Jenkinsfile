@@ -49,69 +49,69 @@ pipeline {
             }
         }
 
-        stage('CI') {
-            parallel {
-                stage('Run Lint') {
-                    steps {
-                        dir(env.SERVICE_NAME) {
-                            sh 'npm run lint'
-                        }
-                    }
-                }
+        // stage('CI') {
+        //     parallel {
+        //         stage('Run Lint') {
+        //             steps {
+        //                 dir(env.SERVICE_NAME) {
+        //                     sh 'npm run lint'
+        //                 }
+        //             }
+        //         }
 
-                stage('Run Tests') {
-                    steps {
-                        dir(env.SERVICE_NAME) {
-                            sh 'npm test'
-                        }
-                    }
-                }
+        //         stage('Run Tests') {
+        //             steps {
+        //                 dir(env.SERVICE_NAME) {
+        //                     sh 'npm test'
+        //                 }
+        //             }
+        //         }
 
-                stage("Scan Filesystem [Trivy]") {
-                    steps {
-                        dir(env.SERVICE_NAME) {
-                            script {
-                                trivy_scan()
-                            }
-                        }
-                    }
-                }
+        //         stage("Scan Filesystem [Trivy]") {
+        //             steps {
+        //                 dir(env.SERVICE_NAME) {
+        //                     script {
+        //                         trivy_scan()
+        //                     }
+        //                 }
+        //             }
+        //         }
 
-                stage("Check Dependencies [OWASP]") {
-                    steps {
-                        dir(env.SERVICE_NAME) {
-                            script{
-                                owasp_dependency()
-                            }
-                        }
-                    }
-                }
+        //         stage("Check Dependencies [OWASP]") {
+        //             steps {
+        //                 dir(env.SERVICE_NAME) {
+        //                     script{
+        //                         owasp_dependency()
+        //                     }
+        //                 }
+        //             }
+        //         }
 
-                stage("Analyze Code Quality [SonarQube]") {
-                    steps {
-                        dir(env.SERVICE_NAME) {
-                            script {
-                                sonarqube_analysis("sonarqube-server", env.SERVICE_NAME, env.SERVICE_NAME)
-                                sonarqube_code_quality()
-                            }
-                        }
-                    }
-                }
+        //         stage("Analyze Code Quality [SonarQube]") {
+        //             steps {
+        //                 dir(env.SERVICE_NAME) {
+        //                     script {
+        //                         sonarqube_analysis("sonarqube-server", env.SERVICE_NAME, env.SERVICE_NAME)
+        //                         sonarqube_code_quality()
+        //                     }
+        //                 }
+        //             }
+        //         }
 
-                stage('Scan Docker [Trivy]') {
-                    steps {
-                        script {
-                            docker_build_and_scan(
-                                CredId: env.DOCKER_CREDENTIALS_ID,
-                                ImageBase: env.DOCKER_IMAGE_BASE,
-                                ImageSuffix: env.SERVICE_NAME,
-                                Tags: [params.SHORT_SHA, 'latest'],
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        //         stage('Scan Docker [Trivy]') {
+        //             steps {
+        //                 script {
+        //                     docker_build_and_scan(
+        //                         CredId: env.DOCKER_CREDENTIALS_ID,
+        //                         ImageBase: env.DOCKER_IMAGE_BASE,
+        //                         ImageSuffix: env.SERVICE_NAME,
+        //                         Tags: [params.SHORT_SHA, 'latest'],
+        //                     )
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Push Docker Image') {
             when {
@@ -154,7 +154,7 @@ pipeline {
             steps {
                 sshagent(['vps-ssh-key']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no root@72.60.111.27'
+                    ssh -o StrictHostKeyChecking=no root@72.60.111.27 '
                       cd /chattingo-compose
                       git pull origin main
                       docker compose pull

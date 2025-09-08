@@ -70,6 +70,7 @@ git clone https://github.com/HasanAshab/chattingo-compose.git
 cd chattingo-compose
 
 # run setup script with your mysql password
+chmod +x setup.sh
 ./setup.sh <your db password>
 
 # run docker compose
