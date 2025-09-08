@@ -101,7 +101,7 @@ pipeline {
         //             }
         //         }
 
-                stage('Scan Docker [Trivy]') {
+                stage('Build and Scan Docker [Trivy]') {
                     steps {
                         script {
                             docker_build_and_scan(
@@ -138,15 +138,17 @@ pipeline {
                 expression { env.GIT_BRANCH == 'origin/main' }
             }
             steps {
-                sh """
-                git clone git@github.com:HasanAshab/chattingo-compose.git
-                cd chattingo-compose
-                sed -i "s|image: chatingo/backend:.*|image: chatingo/backend:${params.SHORT_SHA}|" docker-compose.yml
-                git config user.email "ci@jenkins"
-                git config user.name "Jenkins CI"
-                git commit -am "ci: update frontend image tag to ${params.SHORT_SHA}"
-                git push origin main
-                """
+                sshagent(['github-ssh-key']) {
+                    sh """
+                    git clone git@github.com:HasanAshab/chattingo-compose.git
+                    cd chattingo-compose
+                    sed -i "s|image: chatingo/backend:.*|image: chatingo/backend:${params.SHORT_SHA}|" docker-compose.yml
+                    git config user.email "ci@jenkins"
+                    git config user.name "Jenkins CI"
+                    git commit -am "ci: update backend image tag to ${params.SHORT_SHA}"
+                    git push origin main
+                    """
+                }
             }
         }
 
