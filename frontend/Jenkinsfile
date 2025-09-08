@@ -130,18 +130,35 @@ pipeline {
             }
         }
 
-        stage('Update Compose') {
+        stage('Update Compose Repo') {
+            when {
+                expression { env.GIT_BRANCH == 'main' }
+            }
+            steps {
+                sh """
+                git clone git@github.com:HasanAshab/chattingo-compose.git
+                cd chattingo-compose
+                sed -i "s|image: chatingo/frontend:.*|image: chatingo/frontend:${params.SHORT_SHA}|" docker-compose.yml
+                git config user.email "ci@jenkins"
+                git config user.name "Jenkins CI"
+                git commit -am "ci: update frontend image tag to ${params.SHORT_SHA}"
+                git push origin main
+                """
+            }
+        }
+
+        stage('Deploy to VPS') {
             when {
                 expression { env.GIT_BRANCH == 'main' }
             }
             steps {
                 sshagent(['vps-ssh-key']) {
                     sh """
-                    ssh root@<VPS_IP> '
-                      cd /path/to/compose
-                      sed -i "s|image: chatingo/frontend:.*|image: chatingo/frontend:${params.SHORT_SHA}|" docker-compose.yml
-                      docker-compose pull
-                      docker-compose up -d
+                    ssh -o StrictHostKeyChecking=no root@72.60.111.27'
+                      cd /chattingo-compose
+                      git pull origin main
+                      docker compose pull
+                      docker compose up -d
                     '
                     """
                 }

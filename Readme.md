@@ -27,16 +27,6 @@ ssh -i ~/.ssh/chattingo_vps root@<your-vps-ip>
 
 ---
 
-### 2. Add public key to your VPS
-
-On your VPS, append the public key:
-
-
-
-  ```bash
-   ssh root@<your-vps-ip>
-  ```
----
 
 ### 2. Install Docker & Docker Compose
 
@@ -54,7 +44,7 @@ docker --version
 docker-compose --version
 ```
 
-
+---
 
 ### 3. Install Git (if not present)
 On my VPS there was already git installed.
@@ -64,6 +54,8 @@ But if you don't have git installed, you can install it using the following comm
 apt install -y git
 ```
 
+---
+
 ### 4. Clone the repository
 Now we have to clone [chatingo-compose](https://github.com/HasanAshab/chattingo-compose) repo (not the chatingo repo)
 
@@ -71,6 +63,7 @@ Now we have to clone [chatingo-compose](https://github.com/HasanAshab/chattingo-
 git clone https://github.com/HasanAshab/chattingo-compose.git
 ```
 
+---
 ### 5. Run Docker Compose
 ```bash
 # go to the cloned directory
