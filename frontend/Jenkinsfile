@@ -23,7 +23,7 @@ pipeline {
     environment {
         DOCKER_CREDENTIALS_ID = 'docker'
         DOCKER_REGISTRY = 'docker.io'
-        DOCKER_IMAGE_BASE = 'chatingo'
+        DOCKER_IMAGE_BASE = 'chattingo'
         SERVICE_NAME = 'frontend'
     }
 
@@ -100,20 +100,20 @@ pipeline {
         //             }
         //         }
 
-        //         stage('Scan Docker [Trivy]') {
-        //             steps {
-        //                 script {
-        //                     docker_build_and_scan(
-        //                         CredId: env.DOCKER_CREDENTIALS_ID,
-        //                         ImageBase: env.DOCKER_IMAGE_BASE,
-        //                         ImageSuffix: env.SERVICE_NAME,
-        //                         Tags: [params.SHORT_SHA, 'latest'],
-        //                     )
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+                stage('Scan Docker [Trivy]') {
+                    steps {
+                        script {
+                            docker_build_and_scan(
+                                CredId: env.DOCKER_CREDENTIALS_ID,
+                                ImageBase: env.DOCKER_IMAGE_BASE,
+                                ImageSuffix: env.SERVICE_NAME,
+                                Tags: [params.SHORT_SHA, 'latest'],
+                            )
+                        }
+                    }
+                }
+            }
+        }
 
 
         // stage('Initialize'){
