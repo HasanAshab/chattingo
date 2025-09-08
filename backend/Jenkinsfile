@@ -43,13 +43,13 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                dir(env.SERVICE_NAME) {
-                    sh 'npm ci'
-                }
-            }
-        }
+        // stage('Install Dependencies') {
+        //     steps {
+        //         dir(env.SERVICE_NAME) {
+        //             sh 'npm ci'
+        //         }
+        //     }
+        // }
 
         stage('CI') {
             parallel {
