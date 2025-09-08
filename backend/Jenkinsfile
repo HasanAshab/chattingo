@@ -1,0 +1,178 @@
+@Library('Shared') _ // https://github.com/HasanAshab/Jenkins_SharedLib
+pipeline {
+    // WARN: Never use master node for
+    // running pipeline in production
+    agent any
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+        disableConcurrentBuilds()
+        durabilityHint('PERFORMANCE_OPTIMIZED')
+        preserveStashes(buildCount: 5)
+    }
+
+    tools {
+        nodejs 'node:18'
+    }
+
+    parameters {
+        string(name: 'GIT_BRANCH', defaultValue: '', description: 'Branch name of the commit')
+        string(name: 'SHORT_SHA', defaultValue: '', description: 'Short SHA of the commit')
+    }
+
+    environment {
+        DOCKER_CREDENTIALS_ID = 'docker'
+        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_IMAGE_BASE = 'chattingo'
+        SERVICE_NAME = 'backend'
+    }
+
+    stages {
+        stage('Validate Params') {
+            steps {
+                script {
+                    if (!params.GIT_BRANCH?.trim()) {
+                        error "Parameter GIT_BRANCH is required but not provided!"
+                    }
+                    if (!params.SHORT_SHA?.trim()) {
+                        error "Parameter SHORT_SHA is required but not provided!"
+                    }
+                    echo "GIT_BRANCH: ${params.GIT_BRANCH}"
+                    echo "SHORT_SHA: ${params.SHORT_SHA}"
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir(env.SERVICE_NAME) {
+                    sh 'npm ci'
+                }
+            }
+        }
+
+        stage('CI') {
+            parallel {
+        //         stage('Run Lint') {
+        //             steps {
+        //                 dir(env.SERVICE_NAME) {
+        //                     sh 'npm run lint'
+        //                 }
+        //             }
+        //         }
+
+        //         stage('Run Tests') {
+        //             steps {
+        //                 dir(env.SERVICE_NAME) {
+        //                     sh 'npm test'
+        //                 }
+        //             }
+        //         }
+
+        //         stage("Scan Filesystem [Trivy]") {
+        //             steps {
+        //                 dir(env.SERVICE_NAME) {
+        //                     script {
+        //                         trivy_scan()
+        //                     }
+        //                 }
+        //             }
+        //         }
+
+        //         stage("Check Dependencies [OWASP]") {
+        //             steps {
+        //                 dir(env.SERVICE_NAME) {
+        //                     script{
+        //                         owasp_dependency()
+        //                     }
+        //                 }
+        //             }
+        //         }
+
+        //         stage("Analyze Code Quality [SonarQube]") {
+        //             steps {
+        //                 dir(env.SERVICE_NAME) {
+        //                     script {
+        //                         sonarqube_analysis("sonarqube-server", env.SERVICE_NAME, env.SERVICE_NAME)
+        //                         sonarqube_code_quality()
+        //                     }
+        //                 }
+        //             }
+        //         }
+
+                stage('Scan Docker [Trivy]') {
+                    steps {
+                        script {
+                            docker_build_and_scan(
+                                CredId: env.DOCKER_CREDENTIALS_ID,
+                                ImageBase: env.DOCKER_IMAGE_BASE,
+                                ImageSuffix: env.SERVICE_NAME,
+                                Tags: [params.SHORT_SHA, 'latest'],
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            when {
+                expression { env.GIT_BRANCH == 'origin/main' }
+            }
+            steps {
+                script {
+                    docker_push(
+                        CredId: env.DOCKER_CREDENTIALS_ID,
+                        Registry: env.DOCKER_REGISTRY,
+                        ImageBase: env.DOCKER_IMAGE_BASE,
+                        ImageSuffix: env.SERVICE_NAME,
+                        Tags: [params.SHORT_SHA, 'latest'],
+                    )
+                }
+            }
+        }
+
+        stage('Update Compose Repo') {
+            when {
+                expression { env.GIT_BRANCH == 'origin/main' }
+            }
+            steps {
+                sh """
+                git clone git@github.com:HasanAshab/chattingo-compose.git
+                cd chattingo-compose
+                sed -i "s|image: chatingo/backend:.*|image: chatingo/backend:${params.SHORT_SHA}|" docker-compose.yml
+                git config user.email "ci@jenkins"
+                git config user.name "Jenkins CI"
+                git commit -am "ci: update frontend image tag to ${params.SHORT_SHA}"
+                git push origin main
+                """
+            }
+        }
+
+        stage('Deploy to VPS') {
+            when {
+                expression { env.GIT_BRANCH == 'origin/main' }
+            }
+            steps {
+                sshagent(['vps-ssh-key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no root@72.60.111.27 '
+                      cd /chattingo-compose
+                      git pull origin main
+                      docker compose pull
+                      docker compose up -d
+                    '
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success { echo '✅ Pipeline succeeded!' }
+        failure { echo '❌ Pipeline failed!' }
+    }
+}
