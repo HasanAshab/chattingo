@@ -78,6 +78,7 @@ pipeline {
                             sh """
                             docker run -d \
                               --name test-db \
+                              --network jenkins_network \
                               -e MYSQL_ROOT_PASSWORD=root \
                               -e MYSQL_DATABASE=chattingo_test \
                               -e MYSQL_USER=testuser \
@@ -94,10 +95,11 @@ pipeline {
                                   sleep 2
                                 done
                             """
+
                             // Run tests with Spring Boot properties overridden
                             sh """
                             mvn test \
-                              -Dspring.datasource.url="jdbc:mysql://127.0.0.1:3307/chattingo_test?createDatabaseIfNotExist=true&autoReconnect=true&useSSL=true" \
+                              -Dspring.datasource.url="jdbc:mysql://test-db:3307/chattingo_test?createDatabaseIfNotExist=true&autoReconnect=true&useSSL=true" \
                               -Dspring.datasource.username=testuser \
                               -Dspring.datasource.password=testpass
                             """
