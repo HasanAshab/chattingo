@@ -89,7 +89,7 @@ pipeline {
                             // Run tests with Spring Boot properties overridden
                             sh """
                             mvn test \
-                              -Dspring.datasource.url=jdbc:dbc:mysql://localhost:3306/chattingo_test?createDatabaseIfNotExist=true&autoReconnect=true&useSSL=true \
+                              -Dspring.datasource.url="jdbc:mysql://localhost:3306/chattingo_test?createDatabaseIfNotExist=true&autoReconnect=true&useSSL=true" \
                               -Dspring.datasource.username=testuser \
                               -Dspring.datasource.password=testpass
                             """
