@@ -170,11 +170,24 @@ pipeline {
             steps {
                 sshagent(['vps-ssh-key']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no root@72.60.111.27 '
-                      cd /chattingo-compose
-                      git pull origin main
-                     //... do rest of task
-                    '
+                        ssh -o StrictHostKeyChecking=no root@72.60.111.27 '
+                            set -e
+                            ls -la
+                            cd /chattingo-compose
+
+                            echo ">>> Pulling latest compose repo..."
+                            git reset --hard
+                            git pull origin main
+
+                            echo ">>> Pulling updated images..."
+                            docker compose pull
+
+                            echo ">>> Restarting services..."
+                            docker compose up -d
+
+                            echo ">>> Cleaning unused images..."
+                            docker image prune -af
+                        '
                     """
                 }
             }
