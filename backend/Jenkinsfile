@@ -21,7 +21,7 @@ pipeline {
     }
 
     environment {
-        SERVICE_NAME = 'frontend'
+        SERVICE_NAME = 'backend'
 
         DOCKER_CREDENTIALS_ID = 'docker'
         DOCKER_REGISTRY = 'docker.io'
