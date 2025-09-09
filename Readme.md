@@ -227,7 +227,6 @@ Go to [chattingo](https://github.com/hasanashab/chattingo) repo and navigate to 
 
 
 ## 🚀 Deployment Guide
-
 ### VPS Initial Setup
 First [Connect to your VPS](#1-setup-password-less-ssh-to-vps) do the following step by step:
 
