@@ -138,16 +138,25 @@ pipeline {
                 expression { env.GIT_BRANCH == 'origin/main' }
             }
             steps {
-                sshagent(['github-ssh-key']) {
+                dir('chattingo-compose') {
+                    git branch: 'main',
+                          url: 'git@github.com:HasanAshab/chattingo-compose.git',
+                          credentialsId: env.GITHUB_SSH_CREDENTIALS_ID
+
+                    // Update image tag
                     sh """
-                    git clone git@github.com:HasanAshab/chattingo-compose.git
-                    cd chattingo-compose
-                    sed -i "s|image: chatingo/backend:.*|image: chatingo/backend:${params.SHORT_SHA}|" docker-compose.yml
+                    sed -i "s|image: hasan18205/chattingo-${env.SERVICE_NAME}:.*|image: hasan18205/chattingo-${env.SERVICE_NAME}:${params.SHORT_SHA}|" docker-compose.yml
                     git config user.email "ci@jenkins"
                     git config user.name "Jenkins CI"
-                    git commit -am "ci: update backend image tag to ${params.SHORT_SHA}"
-                    git push origin main
+                    git commit -am "ci: update ${env.SERVICE_NAME} image tag to ${params.SHORT_SHA}"
                     """
+
+                    // Change remote and push changes
+                    withCredentials([sshUserPrivateKey(credentialsId: env.GITHUB_SSH_CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
+                        sh """
+                        GIT_SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no" git push origin HEAD:main
+                        """
+                    }
                 }
             }
         }
@@ -159,12 +168,23 @@ pipeline {
             steps {
                 sshagent(['vps-ssh-key']) {
                     sh """
-                    ssh -o StrictHostKeyChecking=no root@72.60.111.27 '
-                      cd /chattingo-compose
-                      git pull origin main
-                      docker-compose pull
-                      docker-compose up -d
-                    '
+                        ssh -o StrictHostKeyChecking=no ${env.VPS_USER}@${env.VPS_HOST} '
+                            set -e
+                            cd ./chattingo-compose
+
+                            echo ">>> Pulling latest compose repo..."
+                            git reset --hard
+                            git pull origin main
+
+                            echo ">>> Pulling updated images..."
+                            docker-compose pull
+
+                            echo ">>> Restarting services..."
+                            docker-compose up -d
+
+                            echo ">>> Cleaning unused images..."
+                            docker image prune -af
+                        '
                     """
                 }
             }

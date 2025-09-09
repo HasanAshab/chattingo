@@ -46,7 +46,7 @@ function HomePage() {
   // Function to establish a WebSocket connection
   const connect = () => {
     if (!token) return; // don't attempt without auth
-    
+
     const client = new Client({
       webSocketFactory: () => new SockJs(`${BASE_API_URL}/ws`),
       connectHeaders: {
@@ -59,7 +59,7 @@ function HomePage() {
         console.log('STOMP: ' + str);
       },
     });
-    
+
     setStompClient(client);
     client.activate();
   };
@@ -129,8 +129,11 @@ function HomePage() {
   // Effect to handle sending a new message via WebSocket
   useEffect(() => {
     if (message.newMessage && isConnected && stompClient && currentChat?.id) {
-      stompClient.send("/app/message", {}, JSON.stringify(message.newMessage));
-      setMessages((prevMessages) => [...prevMessages, message.newMessage]);
+      try {
+        stompClient.send("/app/message", {}, JSON.stringify(message.newMessage));
+        setMessages((prevMessages) => [...prevMessages, message.newMessage]);
+      }
+      catch (e) { console.log(e) };
     }
   }, [message.newMessage, isConnected, stompClient, currentChat]);
 
