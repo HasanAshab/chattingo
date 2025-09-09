@@ -82,17 +82,22 @@ pipeline {
                               -e MYSQL_DATABASE=chattingo_test \
                               -e MYSQL_USER=testuser \
                               -e MYSQL_PASSWORD=testpass \
-                              -p 3306:3306 \
+                              -p 3307:3306 \ # safer than 3306 to avoid conflicts
                               mysql:8
                             """
 
-                            // Wait for DB to be ready
-                            sh 'sleep 10'
-
+                            // Wait for MySQL to become ready
+                            sh """
+                                echo ">>> Waiting for MySQL to become ready..."
+                                for i in {1..30}; do
+                                  docker exec test-db mysqladmin ping -h"127.0.0.1" -uroot -proot --silent && break
+                                  sleep 2
+                                done
+                            """
                             // Run tests with Spring Boot properties overridden
                             sh """
                             mvn test \
-                              -Dspring.datasource.url="jdbc:mysql://localhost:3306/chattingo_test?createDatabaseIfNotExist=true&autoReconnect=true&useSSL=true" \
+                              -Dspring.datasource.url="jdbc:mysql://127.0.0.1:3307/chattingo_test?createDatabaseIfNotExist=true&autoReconnect=true&useSSL=true" \
                               -Dspring.datasource.username=testuser \
                               -Dspring.datasource.password=testpass
                             """
