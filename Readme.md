@@ -2,7 +2,7 @@
 # Installation instructions
 ## Setup VPS
 ### 1. Setup Password-less SSH to VPS
-On your Jenkins server or agent node, run:
+On your Jenkins master, run:
 
 ```bash
 ssh-keygen -t ed25519 -C "chattingo-vps" -f ~/.ssh/chattingo_vps
@@ -56,27 +56,6 @@ apt install -y git
 ```
 
 ---
-
-### 4. Clone the repository
-Now we have to clone [chatingo-compose](https://github.com/HasanAshab/chattingo-compose) repo (not the chatingo repo)
-
-```bash
-git clone https://github.com/HasanAshab/chattingo-compose.git
-```
-
----
-### 5. Run Docker Compose
-```bash
-# go to the cloned directory
-cd chattingo-compose
-
-# run setup script with your mysql password
-chmod +x setup.sh
-./setup.sh <your db password>
-
-# run docker compose
-docker-compose up -d
-```
 
 ## Setup Jenkins
 Here are the steps to setup Jenkins:
@@ -139,3 +118,49 @@ Go to <mark>Manage Jenkins --> Credentials --> Global</mark> and add the followi
 - Name: `Shared`
 - Default Version: `main`
 - Project Repository: `https://github.com/HasanAshab/Jenkins_SharedLib.git`
+
+### 6. Declarative Pipeline
+Add a Item of type `Folder` name it `chattingo`. Everything related to the project will be inside that folder.
+
+Now create these pipelines:
+- **orchestrator**: The pipeline that orchestrates service pipelines.
+    - Repository URL: `https://github.com/HasanAshab/chattingo`
+    - Script Path: `Jenkinsfile`
+    - Check the `GitHub hook trigger for GITScm polling` box
+
+- **frontend**: Pipeline responsible for CI/CD of frontend.
+    - Repository URL: `https://github.com/HasanAshab/chattingo`
+    - Script Path: `frontend/Jenkinsfile`
+
+- **backend**: Pipeline responsible for CI/CD of backend.
+    - Repository URL: `https://github.com/HasanAshab/chattingo`
+    - Script Path: `backend/Jenkinsfile`
+
+### 7. Github Webhook
+Go to [chattingo](https://github.com/hasanashab/chattingo) repo and navigate to <mark>Settings --> Webhooks</mark> and add the following webhook:
+- Payload URL: `https://<jenkins-server-ip>/github-webhook/`
+- Content type: `application/x-www-form-urlencoded`
+
+
+## Deployment Guide
+
+### VPS Initial Setup
+First [Connect to your VPS](#1-setup-password-less-ssh-to-vps) do the following step by step:
+
+- Clone [chatingo-compose](https://github.com/HasanAshab/chattingo-compose) repo (not the chattingo repo)
+  ```bash
+  git clone https://github.com/HasanAshab/chattingo-compose.git
+  ```
+- Go to the cloned directory
+    ```bash
+    cd chattingo-compose
+    ```
+- Run setup script with your mysql password (First give permission to the script).
+  ```bash
+  chmod +x setup.sh
+  ./setup.sh <your db password>
+  ```
+- Finally run the docker compose
+  ```bash
+  docker-compose up -d
+  ```
