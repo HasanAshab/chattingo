@@ -63,7 +63,7 @@ pipeline {
                 stage('Run Lint') {
                     steps {
                         dir(env.SERVICE_NAME) {
-                            sh 'npm run lint'
+                            sh 'mvn checkstyle:check'
                         }
                     }
                 }
@@ -71,7 +71,32 @@ pipeline {
                 stage('Run Tests') {
                     steps {
                         dir(env.SERVICE_NAME) {
-                            sh 'mvn test'
+                            // Start temporary MySQL container
+                            sh """
+                            docker run -d \
+                              --name test-db \
+                              -e MYSQL_ROOT_PASSWORD=root \
+                              -e MYSQL_DATABASE=chattingo_test \
+                              -e MYSQL_USER=testuser \
+                              -e MYSQL_PASSWORD=testpass \
+                              -p 3306:3306 \
+                              mysql:8
+                            """
+
+                            // Wait for DB to be ready
+                            sh 'sleep 15'
+
+                            // Run tests with Spring Boot properties overridden
+                            sh """
+                            mvn test \
+                              -Dspring.datasource.url=jdbc:dbc:mysql://localhost:3306/chattingo_test?createDatabaseIfNotExist=true&autoReconnect=true&useSSL=true \
+                              -Dspring.datasource.username=testuser \
+                              -Dspring.datasource.password=testpass
+                            """
+
+                            // Stop and remove DB
+                            sh 'docker stop test-db'
+                            sh 'docker rm test-db'
                         }
                     }
                 }

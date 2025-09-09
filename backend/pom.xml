@@ -180,7 +180,25 @@
 					spring-boot-maven-plugin
 				</artifactId>
 				</plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>3.2.2</version>
+            <executions>
+                <execution>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>check</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <!-- You can point to your own rules.xml or use Google rules -->
+                <configLocation>google_checks.xml</configLocation>
+                <failOnViolation>true</failOnViolation>
+            </configuration>
+        </plugin>
 			</plugins>
 		</build>
-		
+
 </project>
