@@ -1,4 +1,53 @@
 
+# Chattingo - Real-time Chat Application
+
+A modern, full-stack real-time chat application built with React, Spring Boot, and WebSocket technology. Features secure authentication, real-time messaging, and group chat functionality.
+
+## 🚀 Project Overview
+
+Chattingo is a comprehensive chat application designed for seamless real-time communication. The application provides a modern user interface with robust backend services, supporting individual and group messaging with real-time updates.
+
+### Key Features
+
+- **Real-time Messaging**: Instant message delivery using WebSocket technology
+- **User Authentication**: Secure JWT-based authentication system
+- **Group Chat**: Create and manage group conversations
+- **User Management**: Profile management and user discovery
+- **Responsive Design**: Mobile-friendly interface built with React and Tailwind CSS
+- **Secure Communication**: End-to-end secure message transmission
+
+## 🛠️ Technology Stack
+
+### Frontend
+- **React 18.2.0** - Modern JavaScript library for building user interfaces
+- **Material-UI (MUI)** - React component library for consistent design
+- **Tailwind CSS** - Utility-first CSS framework for styling
+- **React Router DOM** - Client-side routing for single-page application
+- **Redux Thunk** - State management for predictable application state
+- **STOMP.js & SockJS** - WebSocket client libraries for real-time communication
+- **React Icons** - Comprehensive icon library
+
+### Backend
+- **Spring Boot 3.3.1** - Java framework for building production-ready applications
+- **Spring Security** - Authentication and authorization framework
+- **Spring Data JPA** - Data persistence layer with Hibernate
+- **Spring WebSocket** - Real-time bidirectional communication
+- **JWT (JSON Web Tokens)** - Secure token-based authentication
+- **Maven** - Dependency management and build automation
+- **Java 17** - Latest LTS version of Java
+
+### Database
+- **MySQL 8.0** - Relational database for data persistence
+- **Hibernate** - Object-relational mapping (ORM) framework
+
+### DevOps & Infrastructure
+- **Docker & Docker Compose** - Containerization and orchestration
+- **Jenkins** - Continuous Integration/Continuous Deployment (CI/CD)
+- **Nginx** - Web server and reverse proxy
+- **SonarQube** - Code quality analysis
+- **Trivy** - Container security scanning
+- **OWASP Dependency Check** - Security vulnerability scanning
+
 # Installation instructions
 ## Setup VPS
 ### 1. Setup Password-less SSH to VPS
@@ -164,3 +213,174 @@ First [Connect to your VPS](#1-setup-password-less-ssh-to-vps) do the following 
   ```bash
   docker-compose up -d
   ```
+
+
+## 🔧 Troubleshooting
+
+### Common Issues and Solutions
+
+#### Backend Issues
+
+**Issue: Application fails to start**
+```bash
+# Check Java version
+java -version
+# Should be Java 17 or higher
+
+# Check if port 8080 is available
+netstat -tulpn | grep :8080
+# Kill process if port is occupied
+sudo kill -9 $(lsof -t -i:8080)
+```
+
+**Issue: Database connection failed**
+```bash
+# Check MySQL service status
+sudo systemctl status mysql
+
+# Start MySQL if not running
+sudo systemctl start mysql
+
+# Verify database exists
+mysql -u root -p -e "SHOW DATABASES;"
+
+# Create database if missing
+mysql -u root -p -e "CREATE DATABASE chattingo_db;"
+```
+
+**Issue: JWT token errors**
+```bash
+# Generate new JWT secret (64 characters)
+openssl rand -base64 64
+
+# Update JWT_SECRET in backend/.env
+# Restart the application
+```
+
+#### Frontend Issues
+
+**Issue: CORS errors in browser**
+```bash
+# Check CORS configuration in backend/.env
+CORS_ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
+
+# Restart backend after changing CORS settings
+cd backend && ./mvnw spring-boot:run
+```
+
+**Issue: API connection failed**
+```bash
+# Verify API URL in frontend/.env
+REACT_APP_API_URL=http://localhost:8080
+
+# Check if backend is running
+curl http://localhost:8080/actuator/health
+```
+
+**Issue: WebSocket connection failed**
+```bash
+# Check browser console for WebSocket errors
+# Verify JWT token is valid
+# Ensure backend WebSocket endpoint is accessible
+curl -I http://localhost:8080/ws
+```
+
+#### Docker Issues
+
+**Issue: Docker build fails**
+```bash
+# Clean Docker cache
+docker system prune -a
+
+# Rebuild without cache
+docker-compose build --no-cache
+
+# Check Docker logs
+docker-compose logs [service-name]
+```
+
+**Issue: Container exits immediately**
+```bash
+# Check container logs
+docker logs [container-id]
+
+# Verify environment variables
+docker-compose config
+
+# Check file permissions
+ls -la backend/mvnw
+chmod +x backend/mvnw
+```
+
+#### Production Deployment Issues
+TODO
+
+### Performance Optimization
+
+#### Database Optimization
+TODO
+```sql
+-- Add indexes for better query performance
+CREATE INDEX idx_messages_chat_id ON messages(chat_id);
+CREATE INDEX idx_messages_timestamp ON messages(timestamp);
+CREATE INDEX idx_users_email ON users(email);
+```
+
+#### Frontend Optimization
+```bash
+# Build optimized production bundle
+npm run build
+
+# Analyze bundle size
+npm install -g webpack-bundle-analyzer
+npx webpack-bundle-analyzer build/static/js/*.js
+```
+
+#### Backend Optimization
+```properties
+# Add to application.properties for production
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+logging.level.org.hibernate.SQL=WARN
+server.compression.enabled=true
+```
+
+### Monitoring and Logging
+
+#### Application Health Check
+```bash
+# Backend health endpoint
+curl http://localhost:8080/actuator/health
+
+# Check application metrics
+curl http://localhost:8080/actuator/metrics
+```
+
+#### Log Analysis
+```bash
+# View application logs
+docker-compose logs -f backend
+
+# View specific service logs
+docker logs chattingo-backend-1 --tail 100
+
+# Search for errors
+docker-compose logs backend | grep ERROR
+```
+
+### Getting Help
+
+If you encounter issues not covered here:
+
+1. **Check the logs** - Most issues are revealed in application logs
+2. **Verify configuration** - Ensure all environment variables are set correctly
+3. **Test components individually** - Isolate the problem to specific services
+4. **Check network connectivity** - Verify services can communicate with each other
+5. **Review documentation** - Refer to Spring Boot and React documentation
+6. **Community support** - Join the project Discord or create GitHub issues
+
+For additional support, please create an issue in the GitHub repository with:
+- Detailed error description
+- Steps to reproduce
+- Environment information
+- Relevant log outputs
