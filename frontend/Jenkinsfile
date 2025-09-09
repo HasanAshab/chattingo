@@ -1,4 +1,4 @@
-@Library('Shared') _ // https://github.com/HasanAshab/Jenkins_SharedLib
+@Library('Shared') _  // https://github.com/HasanAshab/Jenkins_SharedLib
 pipeline {
     // WARN: Never use master node for
     // running pipeline in production
