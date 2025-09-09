@@ -110,6 +110,8 @@ Now SSH to your VPS.
 ssh -i ~/.ssh/chattingo_vps root@<your-vps-ip>
 ```
 
+Then copy the private key (`~/.ssh/chattingo_vps`) and store it in Jenkins Credentials. Read [Credentials](#4-credentials) section below
+
 ---
 
 
@@ -183,7 +185,7 @@ Here are the steps to setup SonarQube:
     ```
 - Login to SonarQube server and navigate to <mark>Administration --> Security --> Users --> Tokens</mark> and create the credentials for jenkins to integrate with SonarQube
 
-- Add that token to Jenkins, read  [credentials](#4-credentials) section below
+- Add that token to Jenkins, read  [Credentials](#4-credentials) section below
 
 
 ### 4. Credentials
