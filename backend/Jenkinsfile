@@ -71,6 +71,9 @@ pipeline {
                 stage('Run Tests') {
                     steps {
                         dir(env.SERVICE_NAME) {
+                            // Clean up any leftover test-db
+                            sh 'docker rm -f test-db || true'
+
                             // Start temporary MySQL container
                             sh """
                             docker run -d \
@@ -84,7 +87,7 @@ pipeline {
                             """
 
                             // Wait for DB to be ready
-                            sh 'sleep 15'
+                            sh 'sleep 10'
 
                             // Run tests with Spring Boot properties overridden
                             sh """
