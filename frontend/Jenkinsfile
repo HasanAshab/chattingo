@@ -28,6 +28,9 @@ pipeline {
         DOCKER_IMAGE_BASE = 'chattingo'
 
         GITHUB_SSH_CREDENTIALS_ID = 'github-ssh-key'
+
+        VPS_USER = 'root'
+        VPS_HOST = '72.60.111.27'
     }
 
     stages {
@@ -170,7 +173,7 @@ pipeline {
             steps {
                 sshagent(['vps-ssh-key']) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no root@72.60.111.27 '
+                        ssh -o StrictHostKeyChecking=no ${env.VPS_USER}@${env.VPS_HOST} '
                             set -e
                             cd ./chattingo-compose
 
