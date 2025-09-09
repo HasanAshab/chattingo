@@ -172,8 +172,7 @@ pipeline {
                     sh """
                         ssh -o StrictHostKeyChecking=no root@72.60.111.27 '
                             set -e
-                            ls -la
-                            cd /chattingo-compose
+                            cd ./chattingo-compose
 
                             echo ">>> Pulling latest compose repo..."
                             git reset --hard
