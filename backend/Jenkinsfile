@@ -21,10 +21,17 @@ pipeline {
     }
 
     environment {
+        SERVICE_NAME = 'frontend'
+
         DOCKER_CREDENTIALS_ID = 'docker'
         DOCKER_REGISTRY = 'docker.io'
         DOCKER_IMAGE_BASE = 'chattingo'
-        SERVICE_NAME = 'backend'
+
+        GITHUB_SSH_CREDENTIALS_ID = 'github-ssh-key'
+
+        VPS_USER = 'root'
+        VPS_HOST = '72.60.111.27'
+        VPS_SSH_CREDENTIALS_ID = 'vps-ssh-key'
     }
 
     stages {
@@ -166,7 +173,7 @@ pipeline {
                 expression { env.GIT_BRANCH == 'origin/main' }
             }
             steps {
-                sshagent(['vps-ssh-key']) {
+                sshagent([env.VPS_SSH_CREDENTIALS_ID]) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${env.VPS_USER}@${env.VPS_HOST} '
                             set -e

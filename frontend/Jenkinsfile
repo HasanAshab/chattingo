@@ -31,6 +31,7 @@ pipeline {
 
         VPS_USER = 'root'
         VPS_HOST = '72.60.111.27'
+        VPS_SSH_CREDENTIALS_ID = 'vps-ssh-key'
     }
 
     stages {
@@ -144,6 +145,10 @@ pipeline {
             }
             steps {
                 dir('chattingo-compose') {
+                    // script {
+
+                    // }
+
                     git branch: 'main',
                           url: 'git@github.com:HasanAshab/chattingo-compose.git',
                           credentialsId: env.GITHUB_SSH_CREDENTIALS_ID
@@ -171,7 +176,7 @@ pipeline {
                 expression { env.GIT_BRANCH == 'origin/main' }
             }
             steps {
-                sshagent(['vps-ssh-key']) {
+                sshagent([env.VPS_SSH_CREDENTIALS_ID]) {
                     sh """
                         ssh -o StrictHostKeyChecking=no ${env.VPS_USER}@${env.VPS_HOST} '
                             set -e
