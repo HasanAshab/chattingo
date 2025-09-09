@@ -78,7 +78,7 @@ pipeline {
                             sh """
                             docker run -d \
                               --name test-db \
-                              --network jenkins_network \
+                              --network jenkins_jenkins_network \
                               -e MYSQL_ROOT_PASSWORD=root \
                               -e MYSQL_DATABASE=chattingo_test \
                               -e MYSQL_USER=testuser \
