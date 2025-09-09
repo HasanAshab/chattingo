@@ -179,10 +179,10 @@ pipeline {
                             git pull origin main
 
                             echo ">>> Pulling updated images..."
-                            docker compose pull
+                            docker-compose pull
 
                             echo ">>> Restarting services..."
-                            docker compose up -d
+                            docker-compose up -d
 
                             echo ">>> Cleaning unused images..."
                             docker image prune -af
