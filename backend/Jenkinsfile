@@ -176,11 +176,10 @@ pipeline {
                             git reset --hard
                             git pull origin main
 
-                            echo ">>> Pulling updated images..."
+                            echo ">>> Rebuilding and restarting containers..."
+                            docker-compose down
                             docker-compose pull
-
-                            echo ">>> Restarting services..."
-                            docker-compose up -d
+                            docker-compose up -d --build
 
                             echo ">>> Cleaning unused images..."
                             docker image prune -af
