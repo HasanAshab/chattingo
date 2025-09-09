@@ -3,6 +3,41 @@
 
 A modern, full-stack real-time chat application built with React, Spring Boot, and WebSocket technology. Features secure authentication, real-time messaging, and group chat functionality.
 
+## 📋 Table of Contents
+
+- [🚀 Project Overview](#-project-overview)
+  - [Key Features](#key-features)
+- [🛠️ Technology Stack](#️-technology-stack)
+  - [Frontend](#frontend)
+  - [Backend](#backend)
+  - [Database](#database)
+  - [DevOps & Infrastructure](#devops--infrastructure)
+- [📦 Installation Instructions](#-installation-instructions)
+  - [Setup VPS](#setup-vps)
+    - [1. Setup Password-less SSH to VPS](#1-setup-password-less-ssh-to-vps)
+    - [2. Install Docker & Docker Compose](#2-install-docker--docker-compose)
+    - [3. Install Git](#3-install-git-if-not-present)
+  - [Setup Jenkins](#setup-jenkins)
+    - [1. Plugins](#1-plugins)
+    - [2. Tools Installation](#2-tools-installation)
+    - [3. SonarQube](#3-sonarqube)
+    - [4. Credentials](#4-credentials)
+    - [5. Global Trusted Libraries](#5-global-trusted-libraries)
+    - [6. Declarative Pipeline](#6-declarative-pipeline)
+    - [7. Github Webhook](#7-github-webhook)
+- [🚀 Deployment Guide](#-deployment-guide)
+  - [VPS Initial Setup](#vps-initial-setup)
+- [🔧 Troubleshooting](#-troubleshooting)
+  - [Common Issues and Solutions](#common-issues-and-solutions)
+    - [Backend Issues](#backend-issues)
+    - [Frontend Issues](#frontend-issues)
+  - [Getting Help](#getting-help)
+  - [Log Analysis](#log-analysis)
+  - [Performance Optimization](#performance-optimization)
+    - [Database Optimization](#database-optimization)
+    - [Frontend Optimization](#frontend-optimization)
+    - [Backend Optimization](#backend-optimization)
+
 ## 🚀 Project Overview
 
 Chattingo is a comprehensive chat application designed for seamless real-time communication. The application provides a modern user interface with robust backend services, supporting individual and group messaging with real-time updates.
@@ -48,7 +83,7 @@ Chattingo is a comprehensive chat application designed for seamless real-time co
 - **Trivy** - Container security scanning
 - **OWASP Dependency Check** - Security vulnerability scanning
 
-# Installation instructions
+## 📦 Installation Instructions
 ## Setup VPS
 ### 1. Setup Password-less SSH to VPS
 On your Jenkins master, run:
@@ -191,7 +226,7 @@ Go to [chattingo](https://github.com/hasanashab/chattingo) repo and navigate to 
 - Content type: `application/x-www-form-urlencoded`
 
 
-## Deployment Guide
+## 🚀 Deployment Guide
 
 ### VPS Initial Setup
 First [Connect to your VPS](#1-setup-password-less-ssh-to-vps) do the following step by step:

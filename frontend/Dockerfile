@@ -1,4 +1,4 @@
-FROM node:18 AS build
+FROM node:18 AS base
 
 # set work directory
 WORKDIR /app
@@ -7,6 +7,9 @@ WORKDIR /app
 COPY package*.json .
 RUN npm i
 
+
+FROM base AS builder
+
 # copy source
 COPY . .
 
@@ -14,6 +17,7 @@ COPY . .
 RUN npm run build
 
 
+# Slim production version of nginx
 FROM nginx:1.23.2-alpine
 
 # copy nginx config
@@ -23,7 +27,7 @@ COPY /.nginx/nginx.conf /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html/*
 
 # copy build
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=builder /app/build /usr/share/nginx/html
 
 # run nginx as non-root
 RUN touch /var/run/nginx.pid

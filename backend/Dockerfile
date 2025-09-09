@@ -1,11 +1,14 @@
 # Build stage with Maven and JDK 17
-FROM maven:3.8.5-eclipse-temurin-17 AS builder
+FROM maven:3.8.5-eclipse-temurin-17 AS base
 
 WORKDIR /app
 
 # Cache dependencies
 COPY pom.xml .
 RUN mvn dependency:go-offline
+
+
+FROM base AS builder
 
 # Build app
 COPY src ./src
