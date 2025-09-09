@@ -221,6 +221,13 @@ First [Connect to your VPS](#1-setup-password-less-ssh-to-vps) do the following 
 
 #### Backend Issues
 
+**Issue: Communication link failure**
+
+Check the SPRING_DATASOURCE_URL in backend/.env file. It should be in the format of `jdbc:mysql://<service_name>:<port>/<database_name>`
+
+Note: <service_name> is the name of the MySQL service in Docker Compose.
+
+
 **Issue: Application fails to start**
 ```bash
 # Check Java version
@@ -270,11 +277,8 @@ cd backend && ./mvnw spring-boot:run
 
 **Issue: API connection failed**
 ```bash
-# Verify API URL in frontend/.env
-REACT_APP_API_URL=http://localhost:8080
-
 # Check if backend is running
-curl http://localhost:8080/actuator/health
+curl http://localhost:8080/
 ```
 
 **Issue: WebSocket connection failed**
@@ -285,76 +289,22 @@ curl http://localhost:8080/actuator/health
 curl -I http://localhost:8080/ws
 ```
 
-#### Docker Issues
+### Getting Help
 
-**Issue: Docker build fails**
-```bash
-# Clean Docker cache
-docker system prune -a
+If you encounter issues not covered here:
 
-# Rebuild without cache
-docker-compose build --no-cache
+1. **Check the logs** - Most issues are revealed in application logs
+2. **Verify configuration** - Ensure all environment variables are set correctly
+3. **Test components individually** - Isolate the problem to specific services
+4. **Check network connectivity** - Verify services can communicate with each other
+5. **Review documentation** - Refer to Spring Boot and React documentation
 
-# Check Docker logs
-docker-compose logs [service-name]
-```
 
-**Issue: Container exits immediately**
-```bash
-# Check container logs
-docker logs [container-id]
-
-# Verify environment variables
-docker-compose config
-
-# Check file permissions
-ls -la backend/mvnw
-chmod +x backend/mvnw
-```
-
-#### Production Deployment Issues
-TODO
-
-### Performance Optimization
-
-#### Database Optimization
-TODO
-```sql
--- Add indexes for better query performance
-CREATE INDEX idx_messages_chat_id ON messages(chat_id);
-CREATE INDEX idx_messages_timestamp ON messages(timestamp);
-CREATE INDEX idx_users_email ON users(email);
-```
-
-#### Frontend Optimization
-```bash
-# Build optimized production bundle
-npm run build
-
-# Analyze bundle size
-npm install -g webpack-bundle-analyzer
-npx webpack-bundle-analyzer build/static/js/*.js
-```
-
-#### Backend Optimization
-```properties
-# Add to application.properties for production
-spring.jpa.hibernate.ddl-auto=validate
-spring.jpa.show-sql=false
-logging.level.org.hibernate.SQL=WARN
-server.compression.enabled=true
-```
-
-### Monitoring and Logging
-
-#### Application Health Check
-```bash
-# Backend health endpoint
-curl http://localhost:8080/actuator/health
-
-# Check application metrics
-curl http://localhost:8080/actuator/metrics
-```
+For additional support, please create an issue in the GitHub repository with:
+- Detailed error description
+- Steps to reproduce
+- Environment information
+- Relevant log outputs
 
 #### Log Analysis
 ```bash
@@ -368,19 +318,31 @@ docker logs chattingo-backend-1 --tail 100
 docker-compose logs backend | grep ERROR
 ```
 
-### Getting Help
+### Performance Optimization
 
-If you encounter issues not covered here:
+#### Database Optimization
+```sql
+-- Add indexes for better query performance
+CREATE INDEX idx_messages_chat_id ON messages(chat_id);
+CREATE INDEX idx_messages_timestamp ON messages(timestamp);
+CREATE INDEX idx_users_email ON users(email);
+```
 
-1. **Check the logs** - Most issues are revealed in application logs
-2. **Verify configuration** - Ensure all environment variables are set correctly
-3. **Test components individually** - Isolate the problem to specific services
-4. **Check network connectivity** - Verify services can communicate with each other
-5. **Review documentation** - Refer to Spring Boot and React documentation
-6. **Community support** - Join the project Discord or create GitHub issues
+#### Frontend Optimization
+```conf
+# Add to nginx.conf for caching static filess
+location ~* \.(js|css|png|jpg|jpeg|gif|svg|ico|ttf|woff|woff2)$ {
+    expires 1y;
+    access_log off;
+    add_header Cache-Control "public";
+}
+```
 
-For additional support, please create an issue in the GitHub repository with:
-- Detailed error description
-- Steps to reproduce
-- Environment information
-- Relevant log outputs
+#### Backend Optimization
+```properties
+# Add to application.properties for production
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=false
+logging.level.org.hibernate.SQL=WARN
+server.compression.enabled=true
+```
