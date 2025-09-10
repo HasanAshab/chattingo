@@ -115,8 +115,7 @@ pipeline {
                     steps {
                         dir(env.SERVICE_NAME) {
                             script {
-                                echo "Scanning filesystem for vulnerabilities..."
-                                // trivy_scan()
+                                trivy_scan()
                             }
                         }
                     }
@@ -126,8 +125,7 @@ pipeline {
                     steps {
                         dir(env.SERVICE_NAME) {
                             script {
-                                echo "Checking dependencies for vulnerabilities..."
-                                // owasp_dependency()
+                                owasp_dependency()
                             }
                         }
                     }
@@ -137,9 +135,8 @@ pipeline {
                     steps {
                         dir(env.SERVICE_NAME) {
                             script {
-                                echo "Analyzing code quality..."
-                                // sonarqube_analysis("sonarqube-server", env.SERVICE_NAME, env.SERVICE_NAME)
-                                // sonarqube_code_quality()
+                                sonarqube_analysis("sonarqube-server", env.SERVICE_NAME, env.SERVICE_NAME)
+                                sonarqube_code_quality()
                             }
                         }
                     }
